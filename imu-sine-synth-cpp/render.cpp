@@ -176,6 +176,7 @@ void render(BelaContext *context, void *userData)
 		lastButtonValue = buttonValue;
 		
 		// map yaw, pitch, or roll to frequency for synth
+		// change ypr[0] to ypr[1] or ypr[2] to access the other axes
 		gFrequency = map(ypr[0], M_PI*-0.5, M_PI*0.5, 100, 800);
 		
 		// calculate audio sample for synth
