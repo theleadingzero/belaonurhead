@@ -234,7 +234,7 @@ void I2C_BNO055::getCalibration(uint8_t* sys, uint8_t* gyro, uint8_t* accel, uin
 **************************************************************************/
 uint8_t I2C_BNO055::readRegister(uint8_t reg) 
 {
-    unsigned char inbuf, outbuf;
+    char inbuf, outbuf;
     struct i2c_rdwr_ioctl_data packets;
     struct i2c_msg messages[2];
 
