@@ -4,7 +4,7 @@
 #X msg 361 139 0;
 #X msg 301 85 open ./Lament.wav;
 #X obj 337 199 hsl 128 15 0 1 0 1 empty empty 'roomsize' 20 8 0 10
--262144 -260097 -1 6800 0;
+-262144 -260097 -1 7200 0;
 #X obj 352 242 hsl 128 15 0 2.4 0 1 empty empty damp 20 8 0 10 -262144
 -260097 -1 8200 0;
 #X floatatom 343 220 5 0 0 0 - - -, f 5;
@@ -792,6 +792,7 @@ milliseconds \, based on samplerate.;
 #X text -23 70 Input from IMU;
 #X text -63 83 can receive bno-yaw \, bno-pitch \, or bno-roll;
 #X text 253 22 Handling opening the audio file;
+#X obj 426 135 delay 100;
 #X connect 1 0 15 0;
 #X connect 2 0 15 0;
 #X connect 3 0 15 0;
@@ -809,6 +810,8 @@ milliseconds \, based on samplerate.;
 #X connect 15 0 17 0;
 #X connect 15 0 12 0;
 #X connect 15 0 12 1;
+#X connect 15 1 42 0;
+#X connect 15 1 3 0;
 #X connect 16 0 22 0;
 #X connect 17 0 25 0;
 #X connect 18 0 20 0;
@@ -830,3 +833,4 @@ milliseconds \, based on samplerate.;
 #X connect 34 0 27 0;
 #X connect 34 0 28 0;
 #X connect 37 0 33 0;
+#X connect 42 0 1 0;
