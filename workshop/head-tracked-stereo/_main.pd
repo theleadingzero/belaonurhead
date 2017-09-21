@@ -28,11 +28,14 @@
 #X text 26 81 can receive bno-yaw \, bno-pitch \, or bno-roll;
 #X text 391 372 Volume;
 #X text 389 405 Protects from clipping;
+#X obj 495 243 delay 100;
 #X connect 1 0 4 0;
 #X connect 2 0 4 0;
 #X connect 3 0 4 0;
 #X connect 4 0 5 0;
 #X connect 4 0 6 0;
+#X connect 4 1 3 0;
+#X connect 4 1 29 0;
 #X connect 5 0 9 0;
 #X connect 6 0 10 0;
 #X connect 7 0 0 0;
@@ -50,3 +53,4 @@
 #X connect 19 0 12 0;
 #X connect 19 0 13 0;
 #X connect 22 0 18 0;
+#X connect 29 0 1 0;
