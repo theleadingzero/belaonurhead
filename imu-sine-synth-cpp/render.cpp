@@ -46,7 +46,7 @@ The Bela software is distributed under the GNU Lesser General Public License
 
 
 // Change this to change how often the BNO055 IMU is read (in Hz)
-int readInterval = 10;
+int readInterval = 100;
 
 I2C_BNO055 bno; // IMU sensor object
 int buttonPin = P8_08; // calibration button pin
