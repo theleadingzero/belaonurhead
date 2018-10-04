@@ -69,7 +69,7 @@ float gFFTScaleFactor = 0;
 
 
 // sound source starting azimuths range -180 (anti-clockwise) to 180 (clockwise)
-int gVBAPDefaultAzimuth[10]={-144,-72,-0,72,144,-144,-72,-0,72,144};
+int gVBAPDefaultAzimuth[10]={-90,-72,-0,72,144,-144,-72,-0,72,144};
 
 // sound source starting elevations -90 (down) to 90 (up)
 int gVBAPDefaultElevation[10]={-10,-10,-10,-10,-10,30,30,30,30};
@@ -380,16 +380,21 @@ void Bela_messageHook(const char *source, const char *symbol, int argc, t_atom *
 
 void Bela_floatHook(const char *source, float value){
 	/*
-	 *  MODIFICATION
- 	 *  ------------
-	 *  Parse float sent to receiver 'tremoloRate' and assign it to a global variable
-	 *  N.B. When using libpd receiver names need to be registered (see setup() function below)
+	 *  Our hooks added here
 	 */
-	if(strncmp(source, "sourcePosition1", 11) == 0){
-		gStreamPos1 = value;
-		gVBAPDefaultAzimuth[0] = gStreamPos1;
-		createVectors();
+	int updateVectors = 0;
+	if(strncmp(source, "sourcePosition1", 15) == 0){
+		gVBAPDefaultAzimuth[0] = value;
+		updateVectors = 1;
+	} 
+	if(strncmp(source, "sourceElevation1", 16) == 0){
+		gVBAPDefaultAzimuth[0] = value;
+		updateVectors = 1;
 	}
+
+	// update the vectors only if a change was made
+	if(updateVectors)
+		createVectors();
 
 	/*********/
 
@@ -813,7 +818,7 @@ bool setup(BelaContext *context, void *userData)
 	//---end of Pd
 
 	// print user command line selections
-	rt_printf("Speakers: %d\t Tracks: %d\t Voice Metadata: %d\n", \
+	// rt_printf("Speakers: %d\t Tracks: %d\t Voice Metadata: %d\n", \
 		gSpeakers,gTracks,gVoiceMeta);
 	loadImpulse();    // load HRIRs
 	loadStream();     // load audio streams
@@ -842,11 +847,11 @@ bool setup(BelaContext *context, void *userData)
 	}
 
 	// silence voice metadata streams if switched off by user input
-	if(gVoiceMeta==0){
-		for(int i=NUM_STREAMS/2;i<NUM_STREAMS;i++){
-			gStreamGains[gTracks-1][i]=0.0;
-		}
-	}
+	// if(gVoiceMeta==0){
+	// 	for(int i=NUM_STREAMS/2;i<NUM_STREAMS;i++){
+	// 		gStreamGains[gTracks-1][i]=0.0;
+	// 	}
+	// }
 
 	// initialise streaming auxiliary task
 	if((gFillBuffersTask = Bela_createAuxiliaryTask(&fillBuffers, 89, \
@@ -932,10 +937,7 @@ void process_fft_background(void *) {
 	process_fft();
 }
 
-/*-----------------------------------------------
-* render()
-*
------------------------------------------------*/
+
 void render(BelaContext *context, void *userData){
 	//--Pd start
 	int num;
@@ -1174,17 +1176,6 @@ void render(BelaContext *context, void *userData){
 				sampleStream[i]->processFrame();
 				gInputBuffer[i][gInputBufferPointer] = sampleStream[i]->getSample(0);
 			}
-			//copy output buffer L/R to audio output L/R
-			// for(int channel = 0; channel < context->audioOutChannels; channel++) {
-			// 	if(channel == 0) {
-			// 		context->audioOut[n * context->audioOutChannels + channel] = \
-			// 		gOutputBufferL[gOutputBufferReadPointer];
-			// 	}
-			// 	else if (channel == 1){
-			// 		context->audioOut[n * context->audioOutChannels + channel] = \
-			// 		gOutputBufferR[gOutputBufferReadPointer];
-			// 	}
-			// }
 
 			// write the audio out
 			for (k = 0, p1 = p0; k < context->audioOutChannels; k++, p1 += gLibpdBlockSize) {
@@ -1200,11 +1191,6 @@ void render(BelaContext *context, void *userData){
 			// log the oscillators to the scope
 			//scope.log(context->audioOut[0],context->audioOut[1]);
 
-			/*--- SCRIPT TO ENABLE TEST MODE ---
-			gVBAPUpdatePositions[0]=((gTestElevation+90)*361)+gTestAzimuth+180;
-			writeOutput(gOutputBufferL[gOutputBufferReadPointer], \
-			gOutputBufferR[gOutputBufferReadPointer]);
-			--- ---*/
 
 			// clear the output samples in the buffers so they're ready for the next ola
 			gOutputBufferL[gOutputBufferReadPointer] = 0;

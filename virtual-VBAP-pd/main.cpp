@@ -16,8 +16,8 @@
 using namespace std;
 
 int gSpeakers=8;	// global variable to store VBAP speaker setup (4 or 8)
-int gTracks=5;		// global variable to store number of tracks played back (1 to 5)
-bool gVoiceMeta=1;// global variable to store voice metadate state (off or on)
+int gTracks=0;		// global variable to store number of tracks played back (1 to 5)
+bool gVoiceMeta=0;// global variable to store voice metadate state (off or on)
 
 // Handle Ctrl-C by requesting that the audio rendering stop
 void interrupt_handler(int var)

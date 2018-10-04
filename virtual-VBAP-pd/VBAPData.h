@@ -40,7 +40,7 @@ void getVBAPMatrix()
             convertor >> gVBAPGains[row][col];
         }
     }
-    std::cout << "Test output: " << gVBAPGains[32670][1];
+    // std::cout << "Test output: " << gVBAPGains[32670][1];
 }
 
 // Rows 673, 688, 694, 700, 715, 892, 907, 913, 919, 934

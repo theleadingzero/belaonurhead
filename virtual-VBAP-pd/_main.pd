@@ -1,6 +1,6 @@
-#N canvas 451 115 594 459 10;
+#N canvas 176 117 829 473 10;
 #X text 159 31 Virtual VBAP Example;
-#X obj 225 341 s sourcePosition1;
+#X obj 665 372 s sourcePosition1;
 #X obj 75 86 analogInput0~;
 #X obj 51 371 scope0~;
 #X text 115 371 send the sensor signal to Belascope's first channel
@@ -10,18 +10,70 @@
 #X obj 225 295 * 180;
 #X obj 221 203 snapshot~;
 #X obj 232 127 loadbang;
-#X obj 406 326 print;
+#X obj 130 307 print;
 #X obj 233 156 metro 100;
 #X obj 224 266 - 1;
 #X obj 223 235 * 2;
-#X msg 181 319 90;
-#X obj 134 284 loadbang;
+#X obj 145 139 loadbang;
+#X msg 163 210 -90;
+#X obj 118 213 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 148 194 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X floatatom 142 247 5 0 0 0 - - -, f 5;
+#X obj 129 270 + 1;
+#X obj 454 212 * 180;
+#X obj 454 234 print;
+#X obj 338 172 phasor~ 0.25;
+#X floatatom 651 249 5 0 0 0 - - -, f 5;
+#X obj 651 204 i;
+#X obj 688 162 + 1, f 6;
+#X text 685 204 Store the number;
+#X text 736 162 Add 1 to the number and output the answer;
+#X text 710 95 Reset counter;
+#X text 493 58 Counter input;
+#X obj 681 95 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 595 123 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 630 18 loadbang;
+#X text 701 248 The current position;
+#X text 736 278 Rotate through 0 to 359;
+#X text 702 320 Move to range -180 to 179;
+#X obj 653 321 - 180;
+#X obj 542 354 print position;
+#X obj 574 23 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 597 56 metro 100;
+#X obj 751 301 select 1;
+#X obj 683 275 == 360;
+#X obj 856 353 delay 5;
+#X msg 679 116 0;
 #X connect 2 0 3 0;
-#X connect 2 0 8 0;
 #X connect 8 0 13 0;
 #X connect 9 0 11 0;
 #X connect 11 0 8 0;
 #X connect 12 0 7 0;
 #X connect 13 0 12 0;
-#X connect 14 0 1 0;
-#X connect 15 0 14 0;
+#X connect 15 0 18 0;
+#X connect 16 0 18 0;
+#X connect 17 0 15 0;
+#X connect 19 0 10 0;
+#X connect 20 0 21 0;
+#X connect 23 0 36 0;
+#X connect 23 0 41 0;
+#X connect 24 0 23 0;
+#X connect 24 0 25 0;
+#X connect 25 0 24 1;
+#X connect 30 0 43 0;
+#X connect 31 0 24 0;
+#X connect 32 0 43 0;
+#X connect 32 0 39 0;
+#X connect 36 0 1 0;
+#X connect 36 0 37 0;
+#X connect 38 0 39 0;
+#X connect 39 0 24 0;
+#X connect 40 0 42 0;
+#X connect 41 0 40 0;
+#X connect 42 0 43 0;
+#X connect 43 0 24 0;
