@@ -7,13 +7,13 @@
 // include files
 #include <Bela.h>
 #include <cmath>
-#include <ne10/NE10.h>			// neon library
+#include <ne10/NE10.h>		// neon library
 #include <SampleStream.h>   // adapted Bela code for streaming/processing audio
 #include <SampleLoader.h>   // adapted Bela code for loading short audio files
 #include <ImpulseData.h>    // distinct struct file to identify impulse responses
 #include <VBAPData.h>       // lookup tables for VBAP speaker weightings
 #include <StreamGainData.h> // table for audio track level balancing / muting
-#include <TestRoutine.h>
+#include "Bela_BNO055.h"	// IMU include
 
 // additional includes for Pd
 #include <DigitalChannelManager.h>
@@ -29,14 +29,6 @@ extern "C" {
 #include <sstream>
 
 
-
-
-/*----------*/
-/*----------*/
-/* IMU #includes*/
-#include "Bela_BNO055.h"
-/*----------*/
-/*----------*/
 
 #define BUFFER_SIZE 2048   // BUFFER SIZE
 #define NUM_CHANNELS 1      // NUMBER OF CHANNELS IN AUDIO STREAMS
@@ -76,12 +68,14 @@ int gHopSize = gFFTSize/2;
 float gFFTScaleFactor = 0;
 
 
-// BECKY - ADD AZIMUTHS HERE: range -180 (anti-clockwise) to 180 (clockwise)
+// sound source starting azimuths range -180 (anti-clockwise) to 180 (clockwise)
 int gVBAPDefaultAzimuth[10]={-144,-72,-0,72,144,-144,-72,-0,72,144};
 
-// BECKY - ADD ELEVATIONS HERE: -90 (down) to 90 (up)
+// sound source starting elevations -90 (down) to 90 (up)
 int gVBAPDefaultElevation[10]={-10,-10,-10,-10,-10,30,30,30,30};
 
+// variabls for Pd hooks
+float gStreamPos1 = 0;
 
 //Rotation variables
 float gVBAPDefaultVector[NUM_STREAMS][3];
@@ -90,14 +84,6 @@ int gVBAPUpdatePositions[NUM_STREAMS]={0};
 int gVBAPUpdateAzimuth[NUM_STREAMS]={0};
 int gVBAPUpdateElevation[NUM_STREAMS]={0};
 int gVBAPTracking[3]={0};
-
-// sinewave
-float gFrequencyL = 440.0;
-float gFrequencyR = 230.0;
-float gPhaseL;
-float gPhaseR;
-float gInverseSampleRate;
-float gStreamPos1 = 0;
 
 
 // buffers and configuration for Neon FFT processing
@@ -119,12 +105,20 @@ AuxiliaryTask gFillBuffersTask;
 AuxiliaryTask gFFTTask;
 
 
-// instantiate the scope
-//Scope scope;
-
-//declare process_fft_backround method
-void process_fft_background(void *);
+//function declarations
+void loadImpulse();
+void loadStream();
+void prepFFT();
+void transformHRIRs();
+void fillBuffers(void*);
 void createVectors();
+void rotateVectors();
+void process_fft();
+void process_fft_background(void *);
+bool setup(BelaContext *context, void *userData);
+void render(BelaContext *context, void *userData);
+void cleanup(BelaContext *context, void *userData);
+
 
 
 /*----------*/
@@ -176,6 +170,9 @@ float* gOutBuf;
 #define PARSE_MIDI
 static std::vector<Midi*> midi;
 std::vector<std::string> gMidiPortNames;
+
+
+
 
 void Bela_userSettings(BelaInitSettings *settings)
 {
@@ -618,10 +615,6 @@ void rotateVectors(){
 // configure Bela environment for playback
 bool setup(BelaContext *context, void *userData)
 {
-
-	gInverseSampleRate = 1.0 / context->audioSampleRate;
-	gPhaseL = 0.0;
-	gPhaseR = 0.0;
 	/*----------*/
 	/*----------*/
 	/*IMU #setup routine*/
@@ -1362,7 +1355,7 @@ void readIMU(void*)
 /*----------*/
 
 // Clear all input buffers
-  void cleanup(BelaContext *context, void *userData)
+void cleanup(BelaContext *context, void *userData)
   {
   	for(int i=0;i<NUM_STREAMS;i++) {
   		delete sampleStream[i];
@@ -1380,17 +1373,6 @@ void readIMU(void*)
   	NE10_FREE(signalTimeDomainOutL);
   	NE10_FREE(signalTimeDomainOutR);
   	NE10_FREE(cfg);
-
-  	std::ofstream OutL("testImpL.csv");
-  	std::ofstream OutR("testImpR.csv");
-  	for (int i = 0; i < 187; i++) {
-  		for (int j = 0; j < gConvolutionSize; j++){
-  			OutL << (float)gDataOutputL[i][j] << ',';
-  			OutR << (float)gDataOutputR[i][j] << ',';
-  		}
-  		OutL << '\n';
-  		OutR << '\n';
-  	}
 
   	//--Pd start
   	for(auto a : midi)
