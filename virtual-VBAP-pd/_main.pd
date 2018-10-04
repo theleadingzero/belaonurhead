@@ -1,0 +1,27 @@
+#N canvas 451 115 594 459 10;
+#X text 159 31 Virtual VBAP Example;
+#X obj 225 341 s sourcePosition1;
+#X obj 75 86 analogInput0~;
+#X obj 51 371 scope0~;
+#X text 115 371 send the sensor signal to Belascope's first channel
+;
+#X text 168 86 first sensor Input;
+#X text 276 269 0 to 1 mapped to -180 to 180;
+#X obj 225 295 * 180;
+#X obj 221 203 snapshot~;
+#X obj 232 127 loadbang;
+#X obj 406 326 print;
+#X obj 233 156 metro 100;
+#X obj 224 266 - 1;
+#X obj 223 235 * 2;
+#X msg 181 319 90;
+#X obj 134 284 loadbang;
+#X connect 2 0 3 0;
+#X connect 2 0 8 0;
+#X connect 8 0 13 0;
+#X connect 9 0 11 0;
+#X connect 11 0 8 0;
+#X connect 12 0 7 0;
+#X connect 13 0 12 0;
+#X connect 14 0 1 0;
+#X connect 15 0 14 0;
