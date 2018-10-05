@@ -34,6 +34,7 @@ extern "C" {
 #define NUM_CHANNELS 1      // NUMBER OF CHANNELS IN AUDIO STREAMS
 #define NUM_STREAMS 1     // MAXIMUM NUMBER OF AUDIO STREAMS
 #define NUM_SPEAKERS 8      // MAXIMUM NUMBER OF VIRTUAL SPEAKERS
+#define IMU 1
 
 extern int gSpeakers;       // Number of Speakers chosen by user
 extern int gTracks;         // Concurrent tracks chosen by user
@@ -623,32 +624,33 @@ bool setup(BelaContext *context, void *userData)
 	/*----------*/
 	/*----------*/
 	/*IMU #setup routine*/
-	/*if(!bno.begin()) {
-		rt_printf("Error initialising BNO055\n");
-		return false;
-	}
+	if(IMU == 1) {
+		if(!bno.begin()) {
+			rt_printf("Error initialising BNO055\n");
+			return false;
+		}
 
-	rt_printf("Initialised BNO055\n");
+		rt_printf("Initialised BNO055\n");
 
 	// use external crystal for better accuracy
-	bno.setExtCrystalUse(true);
+		bno.setExtCrystalUse(true);
 
 	// get the system status of the sensor to make sure everything is ok
-	uint8_t sysStatus, selfTest, sysError;
-	bno.getSystemStatus(&sysStatus, &selfTest, &sysError);
-	rt_printf("System Status: %d (0 is Idle)   Self Test: %d (15 is all good)   System Error: %d (0 is no error)\n", sysStatus, selfTest, sysError);
+		uint8_t sysStatus, selfTest, sysError;
+		bno.getSystemStatus(&sysStatus, &selfTest, &sysError);
+		rt_printf("System Status: %d (0 is Idle)   Self Test: %d (15 is all good)   System Error: %d (0 is no error)\n", sysStatus, selfTest, sysError);
 
 	// set sensor reading in a separate thread
 	// so it doesn't interfere with the audio processing
-	i2cTask = Bela_createAuxiliaryTask(&readIMU, 5, "bela-bno");
-	readIntervalSamples = context->audioSampleRate / readInterval;
+		i2cTask = Bela_createAuxiliaryTask(&readIMU, 5, "bela-bno");
+		readIntervalSamples = context->audioSampleRate / readInterval;
 
-	gravityNeutralTask = Bela_createAuxiliaryTask(&getNeutralGravity, 5, "bela-neu-gravity");
-	gravityDownTask = Bela_createAuxiliaryTask(&getDownGravity, 5, "bela-down-gravity");
+		gravityNeutralTask = Bela_createAuxiliaryTask(&getNeutralGravity, 5, "bela-neu-gravity");
+		gravityDownTask = Bela_createAuxiliaryTask(&getDownGravity, 5, "bela-down-gravity");
 
 	// set up button pin
-	pinMode(context, 0, buttonPin, INPUT);
-*/
+		pinMode(context, 0, buttonPin, INPUT);
+	}
 	/*----------*/
 	/*----------*/
 	// Check Pd's version
@@ -1126,46 +1128,49 @@ void render(BelaContext *context, void *userData){
 		for (j = 0, p0 = gOutBuf; j < gLibpdBlockSize; j++, p0++) {
 			/*----------*/
 			/*----------*/
+			if(IMU==1) {
 			/*IMU #setup routine*/
 
-			// this schedules the imu sensor readings
-			/*if(++readCount >= readIntervalSamples) {
-		  		readCount = 0;
-		  		Bela_scheduleAuxiliaryTask(i2cTask);
-			}
+				// this schedules the imu sensor readings
+				if(++readCount >= readIntervalSamples) {
+					readCount = 0;
+					Bela_scheduleAuxiliaryTask(i2cTask);
+				}
 
-			// print IMU values, but not every sample
-			printThrottle++;
-			if(printThrottle >= 4100){
+				// print IMU values, but not every sample
+				printThrottle++;
+				if(printThrottle >= 4100){
 				//rt_printf("Tracker Value: %d %d %d \n",gVBAPTracking[0],gVBAPTracking[1],gVBAPTracking[2]); //print horizontal head-track value
 				//rt_printf("%f %f %f\n", ypr[0], ypr[1], ypr[2]);
 				//rt_printf("Positions Update: %d %d\n",gVBAPUpdatePositions[0],gVBAPUpdatePositions[9]); //print horizontal head-track value
-				imu::Vector<3> qForward = gIdleConj.toEuler();
-				printThrottle = 0;
-			}
+					imu::Vector<3> qForward = gIdleConj.toEuler();
+					printThrottle = 0;
+				}
 
-			//read the value of the button
-			int buttonValue = digitalRead(context, 0, buttonPin);
+				//read the value of the button
+				int buttonValue = digitalRead(context, 0, buttonPin);
 
-			// if button wasn't pressed before and is pressed now
-			if( buttonValue != lastButtonValue && buttonValue == 1 ){
-				// then run calibration to set looking forward (gGravIdle)
-				// and looking down (gGravCal)
-				switch(calibrationState) {
-			case 0: // first time button was pressed
-				setForward = 1;
-				// run task to get gravity values when sensor in neutral position
-				Bela_scheduleAuxiliaryTask(gravityNeutralTask);
-				calibrationState = 1;	// progress calibration state
-				break;
-			case 1: // second time button was pressed
-				// run task to get gravity values when sensor 'looking down' (for head-tracking)
-				Bela_scheduleAuxiliaryTask(gravityDownTask);
-				calibrationState = 0; // reset calibration state for next time
-				break;
-			}
+				// if button wasn't pressed before and is pressed now
+				if( buttonValue != lastButtonValue && buttonValue == 1 ){
+					// then run calibration to set looking forward (gGravIdle)
+					// and looking down (gGravCal)
+					switch(calibrationState) {
+					case 0: // first time button was pressed
+					setForward = 1;
+					// run task to get gravity values when sensor in neutral position
+					Bela_scheduleAuxiliaryTask(gravityNeutralTask);
+					calibrationState = 1;	// progress calibration state
+					break;
+					case 1: // second time button was pressed
+					// run task to get gravity values when sensor 'looking down' (for head-tracking)
+					Bela_scheduleAuxiliaryTask(gravityDownTask);
+					calibrationState = 0; // reset calibration state for next time
+					break;
+					}
+				}
 
-			lastButtonValue = buttonValue;*/
+			lastButtonValue = buttonValue;
+		}
 			/*----------*/
 			/*----------*/
 
