@@ -1,7 +1,0 @@
-#N canvas 176 117 829 473 10;
-#X obj 165 140 s sourcePosition1;
-#X obj 164 63 loadbang;
-#X msg 164 94 90;
-#X text 82 24 Virtual VBAP Position Sound Example;
-#X connect 1 0 2 0;
-#X connect 2 0 0 0;
