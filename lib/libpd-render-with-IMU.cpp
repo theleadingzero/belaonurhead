@@ -62,7 +62,6 @@ extern "C" {
 #include <Scope.h>
 #include <string>
 #include <sstream>
-// #include <rtdk.h>
 #include "Bela_BNO055.h"
 
 //************ Added for BNO055 based head-tracking ***************
@@ -358,7 +357,7 @@ static bool pdMultiplexerActive = false;
 void fdLoop(void* arg){
 	t_pdinstance* pd_that = (t_pdinstance*)arg;
 	while(!gShouldStop){
-		sys_doio(pd_that);
+		sys_doio();
 		usleep(3000);
 	}
 }
