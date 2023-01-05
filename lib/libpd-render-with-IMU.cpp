@@ -288,7 +288,7 @@ static unsigned int gFirstScopeChannel;
 #ifdef ENABLE_BNO055
 #include "Bela_BNO055.h"
 // Change this to change how often the BNO055 IMU is read (in Hz)
-int readInterval = 100;
+int readInterval = 20;
 
 I2C_BNO055 bno; // IMU sensor object
 int buttonPin = 1; // calibration button pin
